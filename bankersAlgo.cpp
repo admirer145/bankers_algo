@@ -61,9 +61,8 @@ bool isSafe(int available[], int n, int m)
                     work[j]+=allocation[i][j];
                 }
                 finish[i]=true;
-                process[k]=i+1;
+                process[k++]=i+1;
                 cntr=1;
-                k++;
             }
         }
     }
@@ -81,43 +80,27 @@ bool isSafe(int available[], int n, int m)
 // RESOURCE REQUEST ALGORITHM
 int resource_request_algo(int p, int request[], int available[], int n, int m)
 {
-    int flag=0;
+    // Check the base condition for request	
     for(int i=0;i<m;i++)
     {
-        if(request[i]>need[p][i])
+        if(request[i]>need[p][i] || request[i]>available[i])
         {
-            flag=1;
-            break;
+            return 0;
         }
     }
-    if(flag)
-    {
-        return 0;
-    }
-    flag=0;
-    for(int i=0;i<m;i++)
-    {
-        if(request[i]>available[i])
-        {
-            flag=1;
-            break;
-        }
-    }
-    if(flag)
-    {
-        return 0;
-    }
-
+	
+    //	Make temporary changes in system
     for(int i=0;i<m;i++)
     {
         available[i]-=request[i];
         allocation[p][i]+=request[i];
         need[p][i]-=request[i];
     }
-
+	
+    // If system is safe then print safe sequence else make the system to its previous state.	
     if(isSafe(available,n,m))
     {
-		for(int i=0;i<n;i++)
+	for(int i=0;i<n;i++)
         {
             cout<<process[i]<<" ";
         }
@@ -139,7 +122,6 @@ int resource_request_algo(int p, int request[], int available[], int n, int m)
 // DRIVER CODE
 int main()
 {
-
     int n,m;
     cout<<"Enter no of process: ";
     cin>>n;
@@ -147,7 +129,6 @@ int main()
     cin>>m;
 
     cout<<"Enter allocation:\n";
-
     for(int i=0;i<n;i++)
     {
         for(int j=0;j<m;j++)
@@ -181,18 +162,22 @@ int main()
     {
         cin>>available[i];
     }
-
-    int p;
+	
+    // Check the current system status
+    if(isSafe(available, n, m))	
+    {
+	    
+    int pno;
     cout<<"Enter process no which want request:";
-    cin>>p;
-    cout<<"Enter request for process "<<p<<" : ";
+    cin>>pno;
+    cout<<"Enter request for process "<<pno<<" : ";
     int request[m];
     for(int i=0;i<m;i++)
     {
         cin>>request[i];
     }
-
-    if(resource_request_algo(p-1, request, available, n, m))
+    // Apply RRA for new request	    
+    if(resource_request_algo(pno-1, request, available, n, m))
     {
         cout<<"The new system is in safe state..."<<endl;
     }
@@ -200,7 +185,13 @@ int main()
     {
         cout<<"The new system is not in safe state..."<<endl;
     }
-
+	    
+    }
+    else
+    {
+	  cout<<"The system is not safe..."<<endl;
+    }
+	
     return 0;
 }
 
